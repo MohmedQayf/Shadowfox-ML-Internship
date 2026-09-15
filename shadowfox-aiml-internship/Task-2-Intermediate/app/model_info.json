@@ -1,0 +1,16 @@
+{
+  "model": "RandomForestRegressor",
+  "r2_test": 0.96,
+  "rmse_lakhs": 0.96,
+  "trained_on": "2026-09-15",
+  "features": [
+    "Present_Price",
+    "Kms_Driven",
+    "Owner",
+    "Car_Age",
+    "Fuel_Type_Diesel",
+    "Fuel_Type_Petrol",
+    "Seller_Type_Individual",
+    "Transmission_Manual"
+  ]
+}

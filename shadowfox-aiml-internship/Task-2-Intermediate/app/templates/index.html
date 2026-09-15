@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Car Price Predictor — ShadowFox Task 2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 30px; }
+  .card { background: #ffffff; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.4); max-width: 720px; width: 100%; padding: 36px 40px; }
+  h1 { font-size: 26px; color: #203a43; margin-bottom: 4px; }
+  .sub { color: #6b7c85; font-size: 14px; margin-bottom: 22px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 20px; }
+  label { display: block; font-size: 13px; font-weight: 600; color: #43555e; margin-bottom: 5px; }
+  input, select { width: 100%; padding: 10px 12px; border: 1px solid #cdd8dd; border-radius: 8px; font-size: 14px; }
+  input:focus, select:focus { outline: 2px solid #2c5364; border-color: transparent; }
+  .full { grid-column: 1 / -1; }
+  button { grid-column: 1 / -1; background: #2c5364; color: #fff; border: none; padding: 14px; font-size: 16px; font-weight: 700; border-radius: 10px; cursor: pointer; transition: .2s; }
+  button:hover { background: #203a43; transform: translateY(-1px); }
+  .result { margin-top: 24px; background: #e8f7ee; border: 1px solid #b7e4c7; border-radius: 12px; padding: 20px 24px; text-align: center; }
+  .result .price { font-size: 34px; font-weight: 800; color: #1b7a43; }
+  .result .note { color: #3d6650; font-size: 13px; margin-top: 4px; }
+  .meta { margin-top: 22px; font-size: 12px; color: #8ba1ab; text-align: center; }
+  code { background: #eef3f5; padding: 2px 6px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>🚗 Car Selling Price Predictor</h1>
+    <p class="sub">Trained on 301 CarDekho listings · Model: <b>{{ info.model }}</b> · Test R² = <b>{{ info.r2_test }}</b></p>
+
+    <form method="POST" action="/predict" class="grid">
+      <div>
+        <label for="present_price">Showroom price of a NEW one (₹ lakhs)</label>
+        <input type="number" step="0.01" min="0" id="present_price" name="present_price" value="{{ inputs.present_price if inputs else '8.5' }}" required>
+      </div>
+      <div>
+        <label for="year">Year of manufacture</label>
+        <input type="number" min="1990" max="2026" id="year" name="year" value="{{ inputs.year if inputs else '2016' }}" required>
+      </div>
+      <div>
+        <label for="kms_driven">Kilometers driven</label>
+        <input type="number" min="0" id="kms_driven" name="kms_driven" value="{{ inputs.kms_driven if inputs else '42000' }}" required>
+      </div>
+      <div>
+        <label for="owner">Previous owners</label>
+        <select id="owner" name="owner">
+          <option value="0">0 (first hand)</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3+</option>
+        </select>
+      </div>
+      <div>
+        <label for="fuel_type">Fuel type</label>
+        <select id="fuel_type" name="fuel_type">
+          <option value="Petrol">Petrol</option>
+          <option value="Diesel">Diesel</option>
+          <option value="CNG">CNG</option>
+        </select>
+      </div>
+      <div>
+        <label for="seller_type">Seller type</label>
+        <select id="seller_type" name="seller_type">
+          <option value="Dealer">Dealer</option>
+          <option value="Individual">Individual</option>
+        </select>
+      </div>
+      <div>
+        <label for="transmission">Transmission</label>
+        <select id="transmission" name="transmission">
+          <option value="Manual">Manual</option>
+          <option value="Automatic">Automatic</option>
+        </select>
+      </div>
+      <button type="submit">Estimate selling price 💰</button>
+    </form>
+
+    {% if prediction is not none %}
+    <div class="result">
+      <div class="price">₹ {{ prediction }} lakh</div>
+      <div class="note">≈ ₹ {{ "{:,.0f}".format(prediction * 100000) }} · model's typical error (RMSE): ₹ {{ info.rmse_lakhs }} lakh</div>
+    </div>
+    {% endif %}
+
+    <p class="meta">
+      JSON API: <code>POST /api/predict</code> with keys <code>present_price, year, kms_driven, owner, fuel_type, seller_type, transmission</code> ·
+      Model trained {{ info.trained_on }}
+    </p>
+  </div>
+</body>
+</html>
